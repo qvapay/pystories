@@ -1,7 +1,7 @@
 import os
 import requests
 from datetime import datetime
-from flask import send_file
+# from flask import send_file
 from fastapi import FastAPI, Request
 from fastapi.responses import JSONResponse, FileResponse
 from telethon import TelegramClient
@@ -207,17 +207,3 @@ async def story_video_handler(payload: dict):
 
     # return {"ok": True, "result": str(result)}
     return {"ok": True, "result": "Story enviada!"}
-
-@app.get("/render")
-def render_video():
-
-    video_path = os.path.join(os.getcwd(), "rates.mp4")
-
-    if not os.path.exists(video_path):
-        return jsonify({"ok": False, "error": "rates.mp4 no existe"}), 404
-
-    return send_file(
-        video_path,
-        mimetype="video/mp4",
-        as_attachment=False  # permite verlo en el navegador
-    )
