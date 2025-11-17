@@ -1,21 +1,132 @@
 import os
 import requests
-from fastapi import FastAPI
-from fastapi.responses import JSONResponse
+from datetime import datetime
+from flask import send_file
+from fastapi import FastAPI, Request
+from fastapi.responses import JSONResponse, FileResponse
 from telethon import TelegramClient
 from telethon.tl import types, functions
 from dotenv import load_dotenv
+from moviepy.editor import VideoFileClip, TextClip, CompositeVideoClip
 
 load_dotenv()
 
 api_id = int(os.getenv("API_ID"))
 api_hash = os.getenv("API_HASH")
 session_path = os.path.join(os.getcwd(), "erich.session")
-
 app = FastAPI()
-
 client = TelegramClient(session_path, api_id, api_hash)
 
+def render_rates_video(
+    input_path="rates.mp4",
+    output_path="rates_final.mp4",
+    cup=None,
+    mlc=None,
+    cla=None
+):
+    """
+    Renderiza el video de tasas con valores CUP / MLC / CLA
+    """
+
+    # ================================
+    # Tamaño del video 2160x3840
+    # ================================
+    VIDEO_W = 2160
+    VIDEO_H = 3840
+
+    # Coordenadas EXACTAS detectadas en tu plantilla
+    CUP_POS = (690, 1270)
+    MLC_POS = (690, 1580)
+    CLA_POS = (690, 1900)
+
+    FONT = "Rubik-Bold"   # Fuente instalada en el sistema
+    FONTSIZE = 200        # Tamaño ajustado para tu video
+
+    clip = VideoFileClip(input_path)
+    overlays = []
+
+    if cup:
+        txt_cup = TextClip(
+            f"{cup}",
+            fontsize=FONTSIZE,
+            color="white",
+            font=FONT,
+            kerning=2
+        ).set_position(CUP_POS).set_duration(clip.duration)
+        overlays.append(txt_cup)
+
+    if mlc:
+        txt_mlc = TextClip(
+            f"{mlc}",
+            fontsize=FONTSIZE,
+            color="white",
+            font=FONT,
+            kerning=2
+        ).set_position(MLC_POS).set_duration(clip.duration)
+        overlays.append(txt_mlc)
+
+    if cla:
+        txt_cla = TextClip(
+            f"{cla}",
+            fontsize=FONTSIZE,
+            color="white",
+            font=FONT,
+            kerning=2
+        ).set_position(CLA_POS).set_duration(clip.duration)
+        overlays.append(txt_cla)
+
+    today = datetime.now().strftime('%d/%m/%Y')
+    date_label = TextClip(
+        f"Actualizado: {today}",
+        fontsize=70,                 # tamaño elegante y legible
+        color="white",
+        font="Rubik-Bold",
+        stroke_color="black",        # para contraste
+        stroke_width=2
+    ).set_position(
+        ("center", 3500)             # posición abajo (Y=3500 en un video de 3840px)
+    ).set_duration(clip.duration)
+    overlays.append(date_label)
+
+    final = CompositeVideoClip([clip] + overlays)
+    final.write_videofile(
+        output_path,
+        codec="libx264",
+        audio_codec="aac",
+        fps=clip.fps
+    )
+
+    return output_path
+
+# ===============================
+#   SEND STORY VIDEO
+# ===============================
+async def send_story_video_async(video_path, caption, entity):
+
+    with open(video_path, "rb") as f:
+        data = f.read()
+
+    uploaded = await client.upload_file(data, file_name="story.mp4")
+
+    result = await client(functions.stories.SendStoryRequest(
+        peer=entity,
+        media=types.InputMediaUploadedDocument(
+            file=uploaded,
+            mime_type="video/mp4",
+            attributes=[
+                types.DocumentAttributeVideo(
+                    duration=25,        # opcional
+                    w=1080,
+                    h=1920,
+                    supports_streaming=True
+                )
+            ]
+        ),
+        caption=caption,
+        privacy_rules=[types.InputPrivacyValueAllowAll()]
+    ))
+
+    return result
 
 # ===============================
 #   ARRANCAR TELETHON
@@ -31,6 +142,7 @@ async def startup():
 # ===============================
 @app.post("/story")
 async def story(payload: dict):
+
     if "imageUrl" not in payload:
         return JSONResponse({"ok": False, "error": "imageUrl es requerido"}, status_code=400)
 
@@ -52,7 +164,7 @@ async def story(payload: dict):
         print("Enviando Story…")
         result = await client(functions.stories.SendStoryRequest(
             # peer=await client.get_input_entity("me"),
-			peer=await client.get_input_entity("@qvapay"),
+            peer=await client.get_input_entity("@qvapay"),
             media=types.InputMediaUploadedPhoto(file=uploaded),
             caption=caption,
             privacy_rules=[types.InputPrivacyValueAllowAll()]
@@ -65,7 +177,43 @@ async def story(payload: dict):
         print("ERROR:", e)
         return JSONResponse({"ok": False, "error": str(e)}, status_code=500)
 
+@app.post("/storyVideo")
+async def story_video_handler(payload: dict):
 
-@app.get("/health")
-async def health():
-    return {"ok": True, "status": "running"}
+    cup = payload.get("cup", "0")
+    mlc = payload.get("mlc", "0")
+    cla = payload.get("cla", "0")
+    caption = payload.get("caption", "")
+
+    video_in = "rates.mp4"
+    video_out = "rates_final.mp4"
+
+    print("Renderizando video con valores dinámicos…")
+    render_rates_video(
+        input_path=video_in,
+        output_path=video_out,
+        cup=cup,
+        mlc=mlc,
+        cla=cla
+    )
+
+    print("Subiendo Story…")
+    # entity = await client.get_input_entity("@qvapay")
+    # result = await send_story_video_async(video_out, caption, entity)
+
+    # return {"ok": True, "result": str(result)}
+    return {"ok": True, "result": "Story enviada!"}
+
+@app.get("/render")
+def render_video():
+
+    video_path = os.path.join(os.getcwd(), "rates.mp4")
+
+    if not os.path.exists(video_path):
+        return jsonify({"ok": False, "error": "rates.mp4 no existe"}), 404
+
+    return send_file(
+        video_path,
+        mimetype="video/mp4",
+        as_attachment=False  # permite verlo en el navegador
+    )
