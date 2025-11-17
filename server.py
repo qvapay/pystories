@@ -17,6 +17,10 @@ session_path = os.path.join(os.getcwd(), "erich.session")
 app = FastAPI()
 client = TelegramClient(session_path, api_id, api_hash)
 
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+FONT_RUBIK_BOLD = os.path.join(BASE_DIR, "fonts", "Rubik-Bold.ttf")
+FONT_RUBIK_REGULAR = os.path.join(BASE_DIR, "fonts", "Rubik-Regular.ttf")
+
 def render_rates_video(
     input_path="rates.mp4",
     output_path="rates_final.mp4",
@@ -39,7 +43,7 @@ def render_rates_video(
     MLC_POS = (690, 1580)
     CLA_POS = (690, 1900)
 
-    FONT = "Rubik-Bold"   # Fuente instalada en el sistema
+    # FONT = "Rubik-Bold"   # Fuente instalada en el sistema
     FONTSIZE = 200        # Tamaño ajustado para tu video
 
     clip = VideoFileClip(input_path)
@@ -50,7 +54,7 @@ def render_rates_video(
             f"{cup}",
             fontsize=FONTSIZE,
             color="white",
-            font=FONT,
+            font=FONT_RUBIK_BOLD,
             kerning=2
         ).set_position(CUP_POS).set_duration(clip.duration)
         overlays.append(txt_cup)
@@ -60,7 +64,7 @@ def render_rates_video(
             f"{mlc}",
             fontsize=FONTSIZE,
             color="white",
-            font=FONT,
+            font=FONT_RUBIK_BOLD,
             kerning=2
         ).set_position(MLC_POS).set_duration(clip.duration)
         overlays.append(txt_mlc)
@@ -70,7 +74,7 @@ def render_rates_video(
             f"{cla}",
             fontsize=FONTSIZE,
             color="white",
-            font=FONT,
+            font=FONT_RUBIK_BOLD,
             kerning=2
         ).set_position(CLA_POS).set_duration(clip.duration)
         overlays.append(txt_cla)
