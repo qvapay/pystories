@@ -110,7 +110,7 @@ async def send_story_video_async(video_path, caption, entity):
     with open(video_path, "rb") as f:
         data = f.read()
 
-    uploaded = await client.upload_file(data, file_name="story.mp4")
+    uploaded = await client.upload_file(data, file_name="rates_final.mp4")
 
     result = await client(functions.stories.SendStoryRequest(
         peer=entity,
@@ -119,7 +119,7 @@ async def send_story_video_async(video_path, caption, entity):
             mime_type="video/mp4",
             attributes=[
                 types.DocumentAttributeVideo(
-                    duration=25,        # opcional
+                    duration=15,        # opcional
                     w=1080,
                     h=1920,
                     supports_streaming=True
@@ -202,8 +202,9 @@ async def story_video_handler(payload: dict):
     )
 
     print("Subiendo Story…")
+    entity = await client.get_input_entity("me")
     # entity = await client.get_input_entity("@qvapay")
-    # result = await send_story_video_async(video_out, caption, entity)
+    result = await send_story_video_async(video_out, caption, entity)
 
     # return {"ok": True, "result": str(result)}
     return {"ok": True, "result": "Story enviada!"}
