@@ -121,7 +121,7 @@ async def send_story_video_async(video_path, caption, entity):
             mime_type="video/mp4",
             attributes=[
                 types.DocumentAttributeVideo(
-                    duration=int(clip.duration),
+                    duration=25,
                     w=1080,
                     h=1920,
                     supports_streaming=True
