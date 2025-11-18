@@ -27,9 +27,10 @@ def render_rates_video(
     cup=None,
     mlc=None,
     cla=None
+	etecsa=None
 ):
     """
-    Renderiza el video de tasas con valores CUP / MLC / CLA
+    Renderiza el video de tasas con valores CUP / MLC / CLA / ETECSA
     """
 
     # ================================
@@ -39,9 +40,10 @@ def render_rates_video(
     VIDEO_H = 1920
 
     # Coordenadas EXACTAS detectadas en tu plantilla
-    CUP_POS = (345, 635)
-    MLC_POS = (345, 790)
-    CLA_POS = (345, 950)
+    CUP_POS = (90, 640)
+    MLC_POS = (90, 790)
+    CLA_POS = (90, 940)
+    ETECSA_POS = (90, 1090)
 
     # FONT = "Rubik-Bold"   # Fuente instalada en el sistema
     FONTSIZE = 100        # Tamaño ajustado para tu video
@@ -51,7 +53,7 @@ def render_rates_video(
 
     if cup:
         txt_cup = TextClip(
-            f"{cup}",
+            f"CUP: {cup}",
             fontsize=FONTSIZE,
             color="white",
             font=FONT_RUBIK_BOLD,
@@ -61,7 +63,7 @@ def render_rates_video(
 
     if mlc:
         txt_mlc = TextClip(
-            f"{mlc}",
+            f"MLC: {mlc}",
             fontsize=FONTSIZE,
             color="white",
             font=FONT_RUBIK_BOLD,
@@ -71,13 +73,23 @@ def render_rates_video(
 
     if cla:
         txt_cla = TextClip(
-            f"{cla}",
+            f"CLA: {cla}",
             fontsize=FONTSIZE,
             color="white",
             font=FONT_RUBIK_BOLD,
             kerning=2
         ).set_position(CLA_POS).set_duration(clip.duration)
         overlays.append(txt_cla)
+
+	if etecsa:
+		txt_etecsa = TextClip(
+			f"ETECSA: {etecsa}",
+			fontsize=FONTSIZE,
+			color="white",
+			font=FONT_RUBIK_BOLD,
+			kerning=2
+		).set_position(ETECSA_POS).set_duration(clip.duration)
+		overlays.append(txt_etecsa)
 
     today = datetime.now().strftime('%d/%m/%Y')
     date_label = TextClip(
@@ -191,6 +203,7 @@ async def story_video_handler(payload: dict):
     cup = payload.get("cup", "0")
     mlc = payload.get("mlc", "0")
     cla = payload.get("cla", "0")
+    etecsa = payload.get("etecsa", "0")
     caption = payload.get("caption", "")
 
     video_in = "rates.mp4"
@@ -202,7 +215,8 @@ async def story_video_handler(payload: dict):
         output_path=video_out,
         cup=cup,
         mlc=mlc,
-        cla=cla
+        cla=cla,
+        etecsa=etecsa
     )
 
     print("Subiendo Story…")
