@@ -93,11 +93,14 @@ def render_rates_video(
     overlays.append(date_label)
 
     final = CompositeVideoClip([clip] + overlays)
+	final = final.resize((1080, 1920))
     final.write_videofile(
         output_path,
         codec="libx264",
         audio_codec="aac",
-        fps=clip.fps
+        fps=clip.fps,
+		preset="medium",
+    	bitrate="3500k"            # muy importante
     )
 
     return output_path
@@ -119,7 +122,7 @@ async def send_story_video_async(video_path, caption, entity):
             mime_type="video/mp4",
             attributes=[
                 types.DocumentAttributeVideo(
-                    duration=15,        # opcional
+                    duration=int(clip.duration),
                     w=1080,
                     h=1920,
                     supports_streaming=True
