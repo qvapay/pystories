@@ -88,7 +88,7 @@ def render_rates_video(
         stroke_color="black",        # para contraste
         stroke_width=2
     ).set_position(
-        ("center", 875)             # posición abajo (Y=875 en un video de 1920px)
+        ("center", 1875)
     ).set_duration(clip.duration)
     overlays.append(date_label)
 
