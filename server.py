@@ -33,18 +33,18 @@ def render_rates_video(
     """
 
     # ================================
-    # Tamaño del video 2160x3840
+    # Tamaño del video 1080x1920
     # ================================
-    VIDEO_W = 2160
-    VIDEO_H = 3840
+    VIDEO_W = 1080
+    VIDEO_H = 1920
 
     # Coordenadas EXACTAS detectadas en tu plantilla
-    CUP_POS = (690, 1270)
-    MLC_POS = (690, 1580)
-    CLA_POS = (690, 1900)
+    CUP_POS = (345, 635)
+    MLC_POS = (345, 790)
+    CLA_POS = (345, 950)
 
     # FONT = "Rubik-Bold"   # Fuente instalada en el sistema
-    FONTSIZE = 200        # Tamaño ajustado para tu video
+    FONTSIZE = 100        # Tamaño ajustado para tu video
 
     clip = VideoFileClip(input_path)
     overlays = []
@@ -82,18 +82,17 @@ def render_rates_video(
     today = datetime.now().strftime('%d/%m/%Y')
     date_label = TextClip(
         f"Actualizado: {today}",
-        fontsize=70,                 # tamaño elegante y legible
+        fontsize=35,                 # tamaño elegante y legible
         color="white",
         font="Rubik-Bold",
         stroke_color="black",        # para contraste
         stroke_width=2
     ).set_position(
-        ("center", 3500)             # posición abajo (Y=3500 en un video de 3840px)
+        ("center", 875)             # posición abajo (Y=875 en un video de 1920px)
     ).set_duration(clip.duration)
     overlays.append(date_label)
 
     final = CompositeVideoClip([clip] + overlays)
-    final = final.resize((1080, 1920))
     final.write_videofile(
         output_path,
         codec="libx264",
