@@ -93,7 +93,7 @@ def render_rates_video(
     overlays.append(date_label)
 
     final = CompositeVideoClip([clip] + overlays)
-	final = final.resize((1080, 1920))
+    final = final.resize((1080, 1920))
     final.write_videofile(
         output_path,
         codec="libx264",
