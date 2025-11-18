@@ -97,9 +97,11 @@ def render_rates_video(
         output_path,
         codec="libx264",
         audio_codec="aac",
-        fps=clip.fps,
-		preset="medium",
-    	bitrate="3500k"            # muy importante
+        fps=24,
+		preset="slow",
+    	bitrate="2500k",
+		threads=4,
+		ffmpeg_params=["-pix_fmt", "yuv420p", "-profile:v", "main", "-level:v", "3.1", "-movflags", "+faststart"]
     )
 
     return output_path
