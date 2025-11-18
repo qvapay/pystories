@@ -206,8 +206,8 @@ async def story_video_handler(payload: dict):
     )
 
     print("Subiendo Story…")
-    entity = await client.get_input_entity("me")
-    # entity = await client.get_input_entity("@qvapay")
+    # entity = await client.get_input_entity("me")
+    entity = await client.get_input_entity("@qvapay")
     result = await send_story_video_async(video_out, caption, entity)
 
     # return {"ok": True, "result": str(result)}
