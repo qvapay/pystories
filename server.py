@@ -27,7 +27,7 @@ def render_rates_video(
     cup=None,
     mlc=None,
     cla=None,
-	etecsa=None
+    etecsa=None
 ):
     """
     Renderiza el video de tasas con valores CUP / MLC / CLA / ETECSA
@@ -81,15 +81,15 @@ def render_rates_video(
         ).set_position(CLA_POS).set_duration(clip.duration)
         overlays.append(txt_cla)
 
-	if etecsa:
-		txt_etecsa = TextClip(
-			f"ETECSA: {etecsa}",
-			fontsize=FONTSIZE,
-			color="white",
-			font=FONT_RUBIK_BOLD,
-			kerning=2
-		).set_position(ETECSA_POS).set_duration(clip.duration)
-		overlays.append(txt_etecsa)
+    if etecsa:
+        txt_etecsa = TextClip(
+            f"ETECSA: {etecsa}",
+            fontsize=FONTSIZE,
+            color="white",
+            font=FONT_RUBIK_BOLD,
+            kerning=2
+        ).set_position(ETECSA_POS).set_duration(clip.duration)
+        overlays.append(txt_etecsa)
 
     today = datetime.now().strftime('%d/%m/%Y')
     date_label = TextClip(
@@ -110,10 +110,10 @@ def render_rates_video(
         codec="libx264",
         audio_codec="aac",
         fps=24,
-		preset="slow",
-    	bitrate="2500k",
-		threads=4,
-		ffmpeg_params=["-pix_fmt", "yuv420p", "-profile:v", "main", "-level:v", "3.1", "-movflags", "+faststart"]
+        preset="slow",
+        bitrate="2500k",
+        threads=4,
+        ffmpeg_params=["-pix_fmt", "yuv420p", "-profile:v", "main", "-level:v", "3.1", "-movflags", "+faststart"]
     )
 
     return output_path
