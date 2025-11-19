@@ -26,7 +26,7 @@ def render_rates_video(
     output_path="rates_final.mp4",
     cup=None,
     mlc=None,
-    cla=None
+    cla=None,
 	etecsa=None
 ):
     """
