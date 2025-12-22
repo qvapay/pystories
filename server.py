@@ -95,7 +95,7 @@ def render_rates_video(
 
     if tropical:
         txt_tropical = TextClip(
-            f"Tropical: {tropical}",
+            f"TROPCAL: {tropical}",
             fontsize=FONTSIZE,
             color="white",
             font=FONT_RUBIK_BOLD,
