@@ -28,7 +28,8 @@ def render_rates_video(
     mlc=None,
     cla=None,
     etecsa=None,
-	tropical=None
+	tropical=None,
+	bolsa=None
 ):
     """
     Renderiza el video de tasas con valores CUP / MLC / CLA / ETECSA
@@ -46,6 +47,7 @@ def render_rates_video(
     CLA_POS = (90, 940)
     ETECSA_POS = (90, 1090)
     TROPICAL_POS = (90, 1240)
+    BOLSA_POS = (90, 1390)
 
     # FONT = "Rubik-Bold"   # Fuente instalada en el sistema
     FONTSIZE = 100        # Tamaño ajustado para tu video
@@ -102,6 +104,16 @@ def render_rates_video(
             kerning=2
         ).set_position(TROPICAL_POS).set_duration(clip.duration)
         overlays.append(txt_tropical)
+
+    if bolsa:
+        txt_bolsa = TextClip(
+            f"BOLSA: {bolsa}",
+            fontsize=FONTSIZE,
+            color="white",
+            font=FONT_RUBIK_BOLD,
+            kerning=2
+        ).set_position(BOLSA_POS).set_duration(clip.duration)
+        overlays.append(txt_bolsa)
 
     today = datetime.now().strftime('%d/%m/%Y')
     date_label = TextClip(
@@ -217,6 +229,7 @@ async def story_video_handler(payload: dict):
     cla = payload.get("cla", "0")
     etecsa = payload.get("etecsa", "0")
     tropical = payload.get("tropical", "0")
+    bolsa = payload.get("bolsa", "0")
     caption = payload.get("caption", "")
 
     video_in = "rates.mp4"
@@ -230,7 +243,8 @@ async def story_video_handler(payload: dict):
         mlc=mlc,
         cla=cla,
         etecsa=etecsa,
-        tropical=tropical
+        tropical=tropical,
+        bolsa=bolsa
     )
 
     print("Subiendo Story…")
